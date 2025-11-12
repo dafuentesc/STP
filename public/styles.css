@@ -1,0 +1,450 @@
+/* --- VARIABLES Y RESET BÁSICO --- */
+:root {
+    /* **AJUSTE CLAVE:** Convertimos a RGBA para lograr transparencia y ver el fondo de video. */
+    --bg-dark: rgba(31, 41, 55, 0.9); /* Fondo principal oscuro (Gray-800 con 90% opacidad) */
+    --bg-surface: rgba(55, 65, 81, 0.9); /* Superficie de tarjetas (Gray-700 con 90% opacidad) */
+    
+    --primary-color: #3b82f6; /* Azul primario (Blue-500) */
+    --accent-color: #f59e0b; /* Amarillo/Naranja de acento (Amber-500) */
+    --text-light: #f3f4f6;
+    --text-muted: #9ca3af;
+    --success-note: #10b981; /* Verde (Emerald-500) */
+    --fail-note: #ef4444; /* Rojo (Red-500) */
+    --shadow-heavy: 0 10px 20px rgba(0, 0, 0, 0.4);
+    --transition-speed: 0.3s;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    /* Mantenemos un color de fallback, pero el video estará visible */
+    background-color: #1a202c; 
+    color: var(--text-light);
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden; 
+    position: relative;
+    padding-bottom: 50px; 
+}
+
+/* --- VIDEO DE FONDO (#video-background) --- */
+
+#video-background {
+    /* Posiciona y centra el video en la ventana */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    /* Asegura que cubra el 100% */
+    min-width: 100%;
+    min-height: 100%;
+    object-fit: cover;
+    
+    /* ¡CLAVE! Lo envía a la capa de fondo */
+    z-index: -2; 
+}
+
+/* ❌ ELIMINACIÓN DE CAPA DE OSCURECIMIENTO (body::before) ❌ */
+/* Este bloque ha sido removido. */
+
+
+/* --- ENCABEZADO (HEADER) --- */
+header {
+    /* Usa la variable --bg-dark (ahora semi-transparente) */
+    background-color: var(--bg-dark); 
+    /* Se mantiene el blur, es lo que da el toque "difuminado" al header */
+    backdrop-filter: blur(5px);
+    padding: 20px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: var(--shadow-heavy);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+
+
+.logo {
+    font-size: 1.6em;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: var(--primary-color);
+}
+.logo i { margin-right: 10px; }
+
+/* --- CONTENEDOR PRINCIPAL Y TARJETAS (CARDS) --- */
+.container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    /* Aseguramos la transparencia del contenedor principal */
+    background-color: transparent; 
+}
+
+.card {
+    /* Usa la variable --bg-surface (ahora semi-transparente) */
+    background-color: var(--bg-surface); 
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: var(--shadow-heavy);
+    border: 1px solid #4b5563; /* Borde sutil */
+    transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6);
+}
+
+.card h2 {
+    color: var(--accent-color);
+    margin-bottom: 25px;
+    border-bottom: 2px solid #4b5563;
+    padding-bottom: 10px;
+    font-weight: 700;
+    font-size: 1.5em;
+}
+.card h2 i { margin-right: 8px; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- BOTONES GENERALES (UX/UI) --- */
+.btn-primary, .btn-secondary, .btn-danger {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-speed) ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: var(--text-light);
+    box-shadow: 0 4px 10px rgba(59, 130, 246, 0.4);
+}
+.btn-primary:hover:not(:disabled) {
+    background-color: #2563eb;
+    transform: translateY(-2px);
+}
+.btn-primary:disabled {
+    background-color: #6b7280;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.btn-secondary {
+    background-color: var(--primary-color);
+    color: var(--text-light);
+    box-shadow: 0 4px 10px rgba(59, 130, 246, 0.4);
+}
+.btn-secondary:hover {
+    background-color: var(--primary-color);
+    color: var(--bg-dark);
+}
+
+.btn-danger {
+    background-color: #dc2626; /* Red-600 */
+    color: var(--text-light);
+}
+.btn-danger:hover {
+    background-color: #b91c1c;
+}
+
+/* --- SELECTOR DE CURSOS --- */
+#current-course-display {
+    text-align: center;
+    padding: 15px;
+    margin-top: 25px;
+    /* Usa un color sólido o ajustado para el contraste */
+    background-color: #4b5563; 
+    border-radius: 8px;
+    font-weight: 600;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.course-badge {
+    color: var(--accent-color);
+    font-weight: 800;
+    text-transform: uppercase;
+}
+.course-badge.active-status {
+    color: var(--success-note);
+}
+
+.course-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 12px;
+}
+
+.course-btn {
+    padding: 15px 5px;
+    background-color: #4b5563;
+    color: var(--text-light);
+    border: 2px solid #4b5563;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 1.1em;
+}
+
+.course-btn:hover {
+    background-color: var(--bg-surface);
+    border-color: var(--primary-color);
+}
+
+.course-btn.active {
+    background-color: var(--success-note);
+    color: var(--bg-dark);
+    border-color: var(--primary-color);
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.7);
+}
+
+
+/* --- SECCIÓN DE INGRESO DE NOTAS (FORMULARIO) --- */
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--text-light);
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #4b5563;
+    border-radius: 6px;
+    font-size: 1em;
+    /* Usamos un color oscuro semi-transparente para el input */
+    background-color: rgba(31, 41, 55, 0.95);
+    color: var(--text-light);
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.input-group input:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+}
+
+/* --- TABLA DE VISUALIZACIÓN DE DATOS --- */
+.data-visualization-section {
+    grid-column: 1 / 3;
+}
+
+.table-container {
+    overflow-x: auto;
+    max-height: 450px;
+    overflow-y: auto;
+    border: 1px solid #4b5563;
+    border-radius: 8px;
+}
+
+#notes-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+#notes-table th, #notes-table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #374151;
+}
+
+#notes-table thead th {
+    background-color: #111827; /* Darker blue, puede ser sólido para mejor visibilidad en la tabla */
+    color: var(--text-light);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    font-size: 0.9em;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+#notes-table tbody tr:nth-child(even) {
+    background-color: rgba(59, 130, 246, 0.05); /* Rayado sutil */
+}
+
+#notes-table tbody tr:hover {
+    background-color: rgba(59, 130, 246, 0.15);
+    cursor: pointer;
+}
+
+/* --- NUEVAS CLASES DE PUNTAJE PAES (4 COLORES) --- */
+
+/* Puntaje < 500 (Rojo) */
+.score-bajo {
+    color: #e74c3c; /* Rojo Ladrillo */
+    font-weight: bold;
+}
+
+/* Puntaje >= 500 y < 700 (Amarillo) */
+.score-medio {
+    color: #f1c40f; /* Amarillo fuerte */
+    font-weight: bold;
+}
+
+/* Puntaje >= 700 y < 800 (Celeste) */
+.score-alto {
+    color: #3498db; /* Azul/Celeste fuerte */
+    font-weight: bold;
+}
+
+/* Puntaje >= 800 (Verde) */
+.score-excelente {
+    color: #2ecc71; /* Verde esmeralda */
+    font-weight: bold;
+}
+
+/* También puedes aplicar un color de fondo para resaltar más, por ejemplo:
+.score-bajo { background-color: rgba(231, 76, 60, 0.1); }
+*/
+
+.delete-btn {
+    background: var(--fail-note);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+.delete-btn:hover {
+    background-color: #b91c1c;
+    transform: scale(1.05);
+}
+
+/* --- PIE DE PÁGINA (FOOTER) --- */
+footer {
+    text-align: center;
+    padding: 15px;
+    background-color: #111827; /* Se mantiene sólido para un buen anclaje visual */
+    color: var(--text-muted);
+    font-size: 0.9em;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    z-index: 50;
+}
+
+/* --- Media Queries (Responsive Design) --- */
+@media (max-width: 900px) {
+    .container {
+        grid-template-columns: 1fr;
+    }
+    .data-visualization-section {
+        grid-column: 1 / 2;
+    }
+    header {
+        flex-direction: column;
+        gap: 15px;
+    }
+    nav button {
+        margin-left: 0;
+        margin-right: 10px;
+    }
+    /* Se eliminó el código duplicado o incorrecto aquí */
+}
+
+/* Estilo para acciones encima de la tabla */
+.table-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+}
+
+/* --- ESTILOS ESPECÍFICOS PARA PDF (Print Mode) --- */
+
+.print-mode {
+    /* 1. Fondo sólido blanco para la sección de datos */
+    background-color: white !important; 
+    color: #333 !important; /* Texto oscuro */
+    
+    /* 2. Asegurarse de que las sombras y el 'blur' desaparezcan en la impresión */
+    box-shadow: none !important;
+    /* Borde sutil, no tan fuerte como el que habías puesto */
+    border: 1px solid #ccc !important;
+}
+
+/* Aplicar fondos sólidos y claros a los elementos internos */
+.print-mode h2,
+.print-mode h2 i {
+    color: #1f2937 !important; /* Títulos oscuros */
+    border-color: #ccc !important;
+}
+
+.print-mode .table-actions {
+    display: none !important; /* Ocultamos el botón de descargar PDF del PDF */
+}
+
+/* Estilos de tabla en modo PDF */
+.print-mode #notes-table thead th {
+    /* Fondo gris claro para la cabecera (más profesional para imprimir) */
+    background-color: #e0e0e0 !important;
+    color: #333 !important; 
+    border-bottom-color: #bbb !important;
+}
+
+.print-mode #notes-table tbody tr {
+    /* Fondo blanco para las filas */
+    background-color: white !important; 
+}
+
+.print-mode #notes-table tbody tr:nth-child(even) {
+    /* Rayado gris muy suave (para mejorar la lectura de filas) */
+    background-color: #f7f7f7 !important; 
+}
+
+.print-mode #notes-table th, 
+.print-mode #notes-table td {
+    border-bottom-color: #eee !important;
+    color: #333 !important;
+}
+
+/* Mantenemos los colores de aprobación/rechazo, pero con fondos muy sutiles */
+.print-mode .note-pass {
+    color: #10b981 !important; 
+    background-color: #f0fff0 !important; /* Verde muy claro */
+}
+.print-mode .note-fail {
+    color: #ef4444 !important; 
+    background-color: #fff0f0 !important; /* Rojo muy claro */
+}
+
+/* Ocultar el botón de eliminar fila */
+.print-mode .delete-btn {
+    display: none !important;
+}
+
+/* styles.css */
+.charts-container h3 {
+    color: #f0f0f0; /* Blanco o un gris muy claro */
+    margin-bottom: 10px;
+}

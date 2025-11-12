@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analizador de Puntajes PAES SIMON BOLIVAR</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1f2937; /* Gris Oscuro de fondo */
+            color: #f3f4f6;
+            min-height: 100vh;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .card {
+            background-color: #374151; /* Gris más claro para las tarjetas */
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+            margin-bottom: 1.5rem;
+        }
+        input[type="text"], input[type="number"], select { /* Agregado select */
+            background-color: #4b5563;
+            border: 1px solid #6b7280;
+            color: #f3f4f6;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            width: 100%;
+        }
+        button {
+            transition: background-color 0.2s;
+        }
+        .btn-primary {
+            background-color: #3b82f6;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+        .btn-primary:hover {
+            background-color: #2563eb;
+        }
+        .btn-course {
+            background-color: #4b5563;
+            color: #d1d5db;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px; /* rounded-full */
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+        .btn-course.active {
+            background-color: #10b981; /* Verde */
+            color: #1f2937;
+            font-weight: 700;
+            border: 2px solid #34d399;
+        }
+        .table-responsive {
+            overflow-x: auto;
+        }
+        .data-table th, .data-table td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid #4b5563;
+        }
+        .data-table th {
+            background-color: #4b5563;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            color: #9ca3af;
+        }
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+        /* ESTILO CORREGIDO: Define una altura fija para el contenedor del gráfico */
+        .chart-container {
+            position: relative;
+            height: 350px; /* Altura para evitar el crecimiento infinito del canvas */
+            width: 100%;
+        }
+        canvas {
+            max-width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <h1 class="text-3xl font-bold mb-8 text-center text-indigo-400">Analizador de Puntajes PAES SIMON BOLIVAR</h1>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-6xl w-full">
+
+        <div class="lg:col-span-1 card">
+            <h2 class="text-xl font-semibold mb-4 text-yellow-400">📊 Selecciona una Prueba PAES</h2>
+            <div id="course-buttons" class="flex flex-wrap gap-2 mb-4">
+                </div>
+            <div class="p-3 rounded bg-gray-600 text-center">
+                Prueba Activa: <span id="current-course-display" class="font-bold text-green-400">NINGUNA</span>
+            </div>
+        </div>
+
+        <div class="lg:col-span-2 card">
+            <h2 class="text-xl font-semibold mb-4 text-yellow-400">📝 Ingreso Rápido de Notas</h2>
+            <form id="note-form" onsubmit="handleNoteSubmission(event)">
+                <div class="space-y-4">
+                    
+                    <div>
+                        <label for="rut" class="block text-sm font-medium mb-1">RUT del Estudiante</label>
+                        <input type="text" id="rut" placeholder="Ej: 12345678-9 (sin puntos ni guiones)" required pattern="[0-9kK]{7,10}" title="RUT válido, sin puntos ni guiones. Mínimo 7 caracteres."/>
+                    </div>
+
+                    <div>
+                        <label for="student-name" class="block text-sm font-medium mb-1">Nombre del Estudiante</label>
+                        <input type="text" id="student-name" placeholder="Ej: Juan Pérez" required>
+                    </div>
+                    
+                    <div>
+                        <label for="ensayo-type" class="block text-sm font-medium mb-1">Tipo de Ensayo (Número de Prueba)</label>
+                        <select id="ensayo-type" required>
+                            <option value="" disabled selected>Seleccione el número de ensayo</option>
+                            <option value="Ensayo 1">Ensayo 1</option>
+                            <option value="Ensayo 2">Ensayo 2</option>
+                            <option value="Ensayo 3">Ensayo 3</option>
+                            <option value="Ensayo 4">Ensayo 4</option>
+                            <option value="Ensayo 5">Ensayo 5</option>
+                            <option value="PAES Oficial">PAES Oficial</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="correct-answers" class="block text-sm font-medium mb-1">Respuestas Correctas</label>
+                        <input type="number" id="correct-answers" placeholder="Ej: 42" min="0" max="80" required>
+                    </div>
+
+                    <button type="submit" class="btn-primary w-full mt-4">
+                        <i class="fas fa-save mr-2"></i> REGISTRAR NOTA
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card w-full max-w-6xl mt-6">
+        <h2 class="text-xl font-semibold mb-4 text-yellow-400">📜 Detalle de Notas: <span id="detail-course-title" class="text-green-400">Competencia Lectora</span></h2>
+
+        <div class="flex flex-wrap gap-3 mb-6">
+            <button class="btn-primary bg-red-600 hover:bg-red-700" onclick="generateReport('pdf')">DESCARGAR PDF</button>
+            <button class="btn-primary bg-green-600 hover:bg-green-700" onclick="generateReport('excel')">DESCARGAR EXCEL</button>
+            <button class="btn-primary bg-blue-600 hover:bg-blue-700" onclick="generateReport('word')">DESCARGAR WORD</button>
+        </div>
+
+        <div class="table-responsive">
+            <table id="notes-table" class="data-table w-full">
+                <thead>
+                    <tr>
+                        <th>RUT</th>
+                        <th>Alumno</th>
+                        <th>Prueba PAES</th>
+                        <th>Tipo Ensayo</th>
+                        <th>✔ Correctas</th>
+                        <th>Puntaje PAES</th>
+                        <th>Promedio Parcial</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td colspan="8" class="text-center py-4 text-gray-400">Selecciona una prueba para ver los resultados.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+            <div class="p-4 bg-gray-700 rounded-lg chart-container"> 
+                <h3 class="text-lg font-semibold mb-3">Distribución de Notas de la Prueba</h3>
+                <canvas id="distribution-chart"></canvas>
+            </div>
+            <div class="p-4 bg-gray-700 rounded-lg chart-container"> 
+                <h3 class="text-lg font-semibold mb-3">Top 5 Mejores Promedios</h3>
+                <canvas id="top-students-chart"></canvas>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script> 
+    
+   
+    <script src="script.js"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script> 
+</body>
+</html>
+
