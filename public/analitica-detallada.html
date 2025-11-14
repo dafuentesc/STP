@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análisis Detallado por Prueba</title>
+    <style>
+        /* Estilos básicos integrados para la nueva vista */
+        body { background-color: #212529; color: #f8f9fa; padding: 20px; }
+        .container { max-width: 1200px; margin: auto; }
+        hr { border-color: #495057; }
+        .card-analitica {
+            background-color: #343a40; 
+            border: 1px solid #495057; 
+            margin-bottom: 25px; /* Espacio entre los recuadros */
+            padding: 20px;
+            border-radius: 8px;
+            height: 100%; /* Asegura que todos los recuadros en la fila tengan la misma altura */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .card-analitica h3 { 
+            color: #17a2b8; /* Color similar al de tu dashboard */
+            border-bottom: 2px solid #17a2b8; 
+            padding-bottom: 10px; 
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        .kpi-value { 
+            font-size: 2.2em; 
+            font-weight: bold; 
+            color: #28a745; /* Color de éxito/positivo */
+            margin-bottom: 10px;
+        }
+        .list-unstyled li {
+            padding: 5px 0;
+            border-top: 1px dotted #495057;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="mt-4 mb-4 text-center">📊 Módulo de Analítica Detallada por Evaluación</h2>
+        <p class="lead text-center">Indicadores Clave de Rendimiento (KPIs) agrupados por tipo de prueba.</p>
+        <hr>
+
+        <div id="analitica-container" class="row">
+        </div>
+
+        <a href="index.html" class="btn btn-secondary mt-4">← Volver al Dashboard Principal</a>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const container = document.getElementById('analitica-container');
+        const formatNumber = (num) => Math.round(num);
+
+        if (!container) return;
+
+        // FUNCIÓN QUE HACE LA LLAMADA AL SERVIDOR
+        async function cargarAnalitica() {
+            try {
+                // Llama a la nueva ruta que creaste en server.js
+                const response = await fetch('/api/analisis-pruebas'); 
+                
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+                
+                // Los datos reales de MySQL
+                const datosAnaliticaReales = await response.json(); 
+
+                if (datosAnaliticaReales.length === 0) {
+                    container.innerHTML = '<p class="text-warning mt-5">No se encontraron datos agrupados para mostrar la analítica.</p>';
+                    return;
+                }
+
+                // Generar los recuadros con los datos reales
+                datosAnaliticaReales.forEach(prueba => {
+                    const colDiv = document.createElement('div');
+                    colDiv.className = 'col-lg-4 col-md-6'; 
+
+                    colDiv.innerHTML = `
+                        <div class="card-analitica">
+                            <h3>${prueba.nombre_evaluacion}</h3>
+                            
+                            <div class="mb-3">
+                                <small class="text-secondary">Puntaje Promedio (PAES)</small>
+                                <div class="kpi-value">${formatNumber(prueba.Promedio_General)}</div>
+                            </div>
+
+                            <ul class="list-unstyled">
+                                <li>
+                                    Total de Evaluados: <strong>${prueba.Total_Estudiantes}</strong>
+                                </li>
+                                <li>
+                                    Puntaje Máximo: <strong>${formatNumber(prueba.Max_Puntaje)}</strong>
+                                </li>
+                                <li>
+                                    Puntaje Mínimo: <strong>${formatNumber(prueba.Min_Puntaje)}</strong>
+                                </li>
+                            </ul>
+                        </div>
+                    `;
+                    container.appendChild(colDiv);
+                });
+
+            } catch (error) {
+                console.error('Fallo al cargar la analítica desde el servidor:', error);
+                container.innerHTML = `<p class="text-danger mt-5">Error al conectar con el servidor: ${error.message}</p>`;
+            }
+        }
+
+        cargarAnalitica();
+    });
+</script>
+</body>
+</html>

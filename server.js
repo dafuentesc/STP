@@ -79,6 +79,44 @@ app.post('/api/resultados', async (req, res) => {
         if (connection) connection.end();
     }
 });
+// Asegúrate de tener tu objeto 'db' o 'connection' configurado
+
+// --- RUTA CORREGIDA PARA LA ANALÍTICA DETALLADA ---
+app.get('/api/analisis-pruebas', async (req, res) => {
+    let connection;
+    try {
+        // Usa el mismo patrón de conexión asíncrona que el resto de tus rutas
+        connection = await mysql.createConnection(dbConfig);
+        
+        // Consulta SQL que agrupa y calcula los KPIs por nombre de prueba
+        const sql = `
+            SELECT
+                nombre_evaluacion,
+                COUNT(rut) AS Total_Estudiantes,
+                AVG(puntaje_paes) AS Promedio_General,
+                MAX(puntaje_paes) AS Max_Puntaje,
+                MIN(puntaje_paes) AS Min_Puntaje
+            FROM
+                resultados_paes
+            GROUP BY
+                nombre_evaluacion;
+        `;
+        
+        // Usar .execute() de mysql2/promise
+        const [results] = await connection.execute(sql);
+        
+        // Envía los resultados de la consulta como JSON al frontend
+        res.json(results);
+
+    } catch (error) {
+        console.error('Error al obtener la analítica detallada:', error);
+        // Envía un error 500 al cliente
+        res.status(500).json({ error: 'Error interno del servidor al obtener analítica', details: error.message });
+    } finally {
+        if (connection) connection.end();
+    }
+});
+// -----------------------------------------------------
 
 
 /**
